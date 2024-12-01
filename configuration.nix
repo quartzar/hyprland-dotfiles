@@ -72,6 +72,18 @@
   services.dbus.enable = true;
   services.gvfs.enable = true;
 
+  # Keyring
+#   services.gnome.gnome-keyring = {
+#     enable = true;
+#   };
+#   security.pam.services.sddm.kwallet.enable = true;
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services = {
+    login.enableGnomeKeyring = true;
+    sddm.enableGnomeKeyring = true;
+    gdm-password.enableGnomeKeyring = true;
+  };
+
   # SDDM/xserver
   services.xserver = {
     enable = true;
@@ -82,6 +94,15 @@
     wayland.enable = true;
   };
 
+  # Flatpak
+  services.flatpak.enable = true;
+
+  # Plex
+#   services.plex = {
+#     enable = true;
+#     openFirewall = true;
+#   };
+
   # Portal (?)
   xdg.portal = {
     enable = true;
@@ -90,6 +111,7 @@
         pkgs.xdg-desktop-portal-gtk
       ];
     config.common.default = "*";
+    xdgOpenUsePortal = true;
   };
 
 
@@ -112,6 +134,8 @@
     XDG_DATA_HOME   = "$HOME/.local/share";
 #     XDG_STATE_HOME  = "$HOME/.local/state";
     ELECTRON_OZONE_PLATFORM_HINT = "wayland";
+    SSH_AUTH_LOCK = "/run/user/1000/keyring/ssh";
+#     XDG_DATA_DIRS = "/var/lib/flatpak/exports/share:/home/quartzar/.local/share/flatpak/exports/share:$XDG_DATA_DIRS";
   };
 
 
@@ -226,6 +250,12 @@
     vscode
     papirus-icon-theme  # like my beloved gruvbox icons, https://www.pling.com/p/1166289/
     (discord.override { withVencord = true; })
+    seahorse  # GUI for managing passwords
+    libsecret  # secret service API
+    flatpak
+    vlc
+    plex-desktop
+    nwg-look
   ];
   
 
@@ -259,7 +289,8 @@
     enable = true;
     description = "polkit-kde-authentication-agent-1";
     wantedBy = [ "graphical-session.target" ];
-    after = [ "graphical-session.target" ];
+    wants = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" "dbus.service" ];
     serviceConfig = {
       Type = "simple";
       ExecStart = "${pkgs.polkit-kde-agent}/libexec/polkit-kde-authentication-agent-1";

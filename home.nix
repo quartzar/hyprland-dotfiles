@@ -283,6 +283,7 @@
         "swww-daemon"
         "waybar"
         "gammastep -m wayland"
+        "eval $(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh)"
       ];
 
       env = [
