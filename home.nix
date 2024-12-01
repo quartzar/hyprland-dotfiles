@@ -38,6 +38,8 @@
     shellAliases = {
       rebuild = "sudo nixos-rebuild switch --flake /etc/nixos#default";
       testbuild = "sudo nixos-rebuild test --flake /etc/nixos#default";
+      sudo = "sudo ";
+      python = "python3";
     };
 
     history = {
@@ -63,6 +65,35 @@
       # Autocomplete settings
       zstyle ':autocomplete:*' list-lines 7
       zstyle ':completion:*' menu select=long
+
+      # Add Kagi to web-search plugin
+      export ZSH_WEB_SEARCH_ENGINES=(kagi "https://kagi.com/search?q=")
+
+      # Add command expansion display
+      autoload -U add-zsh-hook
+
+      alias_for() {
+        local search=$1
+        local found="$(alias $search)"
+        if [[ -n $found ]]; then
+          found=''${found//\\//}
+          found=''${found%\'}
+          found=''${found#"$search="}
+          found=''${found#"'"}
+          echo "''${found} $2"
+        fi
+      }
+
+      expand_command_line() {
+        first=$(echo "$1" | awk '{print $1;}')
+        rest=$(echo "''${1//"$first"/}")
+        cmd_alias="$(alias_for "''${first}" "''${rest:1}")"
+        if [[ -n $cmd_alias ]]; then
+          echo "\033[32m❯ \033[33m$cmd_alias\033[0m"
+        fi
+      }
+
+      add-zsh-hook preexec expand_command_line
     '';
 
     initExtra = "source ~/.p10k.zsh";
@@ -73,8 +104,14 @@
 #         { name = "marlonrichert/zsh-autocomplete"; tags = [ "depth:1" ]; }
 #         { name = "zsh-users/zsh-autosuggestions"; }
 #         { name = "zsh-users/zsh-syntax-highlighting"; }
-        { name = "zdharma-continuum/fast-syntax-highlighting"; }
         { name = "plugins/git"; tags = [ "from:oh-my-zsh" ]; }
+        { name = "plugins/web-search"; tags = [ "from:oh-my-zsh" ]; }
+        { name = "plugins/copyfile"; tags = [ "from:oh-my-zsh" ]; }
+        { name = "zdharma-continuum/fast-syntax-highlighting"; }
+        { name = "MichaelAquilina/zsh-autoswitch-virtualenv"; }
+        { name = "MichaelAquilina/zsh-you-should-use"; }
+        { name = "zsh-users/zsh-history-substring-search"; }
+        { name = "agkozak/zsh-z"; }
         { name = "romkatv/powerlevel10k"; tags = [ "as:theme" "depth:1" ]; }
       ];
     };
@@ -191,8 +228,8 @@
       package = pkgs.gnome-themes-extra;
     };
     iconTheme = {
-      name = "Adwaita";
-      package = pkgs.adwaita-icon-theme;
+      name = "Papirus-Dark";
+      package = pkgs.papirus-icon-theme;
     };
     cursorTheme = {
       name = "Adwaita";
@@ -212,7 +249,7 @@
 
   qt = {
     enable = true;
-    platformTheme.name = "gtk";
+    platformTheme.name = "gtk";  # This makes Qt use GTK theme settings
     style = {
       name = "adwaita-dark";
       package = pkgs.adwaita-qt;

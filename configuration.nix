@@ -111,6 +111,7 @@
     XDG_CONFIG_HOME = "$HOME/.config";
     XDG_DATA_HOME   = "$HOME/.local/share";
 #     XDG_STATE_HOME  = "$HOME/.local/state";
+    ELECTRON_OZONE_PLATFORM_HINT = "wayland";
   };
 
 
@@ -197,8 +198,9 @@
     wlogout
     swaylock-effects
     swayidle
-    dolphin        # my beloved
     home-manager
+    kdePackages.dolphin        # my beloved
+    kdePackages.dolphin-plugins
     kdePackages.kate
     kdePackages.ktexteditor
     kdePackages.kauth
@@ -222,6 +224,8 @@
     zsh-syntax-highlighting
     spotify
     vscode
+    papirus-icon-theme  # like my beloved gruvbox icons, https://www.pling.com/p/1166289/
+    (discord.override { withVencord = true; })
   ];
   
 
