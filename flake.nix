@@ -23,6 +23,10 @@
       modules = [
         ./configuration.nix
         inputs.home-manager.nixosModules.default
+        {
+          # Ignore dirty git tree
+          system.configurationRevision = nixpkgs.lib.mkIf (self ? rev) self.rev;
+        }
       ];
     };
   };

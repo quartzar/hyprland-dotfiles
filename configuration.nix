@@ -221,6 +221,7 @@
     zsh-autosuggestions
     zsh-syntax-highlighting
     spotify
+    vscode
   ];
   
 
