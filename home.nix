@@ -280,6 +280,9 @@
 
       exec-once = [
 #         "eww daemon && eww open bar"
+#         "swaylock"
+#         "gnome-keyring-daemon --start --components=secrets"
+#         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "swww-daemon"
         "waybar"
         "gammastep -m wayland"
@@ -460,6 +463,14 @@
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
+
+  nixpkgs.config.allowUnfreePredicate = _: true;
+
+  programs.vscode = {
+    enable = true;
+    package = pkgs.vscode.fhs;
+  };
+
 #   home.packages = [
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
@@ -494,6 +505,7 @@
     # '';
 #   };
 
+
   # Home Manager can also manage your environment variables through
   # 'home.sessionVariables'. These will be explicitly sourced when using a
   # shell provided by Home Manager. If you don't want to manage your shell
@@ -512,6 +524,11 @@
   #
 #   home.sessionVariables = {
     # EDITOR = "emacs";
+#   };
+
+#   home.sessionVariables = {
+#     SSH_AUTH_SOCK = "/run/user/${UID}/keyring/ssh";
+#     GNOME_KEYRING_CONTROL = "/run/user/${UID}/keyring";
 #   };
 
   # Let Home Manager install and manage itself.

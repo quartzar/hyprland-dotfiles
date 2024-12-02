@@ -70,6 +70,7 @@
 
   # Required Services
   services.dbus.enable = true;
+#   services.dbus.packages = [ pkgs.gcr ];
   services.gvfs.enable = true;
 
   # Keyring
@@ -77,22 +78,94 @@
 #     enable = true;
 #   };
 #   security.pam.services.sddm.kwallet.enable = true;
-  services.gnome.gnome-keyring.enable = true;
-  security.pam.services = {
-    login.enableGnomeKeyring = true;
-    sddm.enableGnomeKeyring = true;
-    gdm-password.enableGnomeKeyring = true;
-  };
+#   services.gnome.gnome-keyring.enable = true;
+#   security.pam.services = {
+#     login.enableGnomeKeyring = true;
+#     sddm.enableGnomeKeyring = true;
+#     gdm-password.enableGnomeKeyring = true;
+#   };
 
-  # SDDM/xserver
+
+  # Login and keyring
+  # Enable greetd with regreet
+#   services.greetd = {
+#     enable = true;
+#     package = pkgs.greetd;
+#   };
+#
+#   programs.regreet = {
+#     enable = true;
+#     settings = {
+# #       background = {
+# #         path = "/path/to/your/wallpaper.png";  # Optional
+# #         fit = "Cover";  # Optional
+# #       };
+#       GTK = {
+#         application_prefer_dark_theme = true;
+# #         theme_name = "Adwaita-dark";
+# #         icon_theme_name = "Papirus-Dark";
+#       };
+#       commands = {
+#         reboot = ["systemctl" "reboot"];
+#         poweroff = ["systemctl" "poweroff"];
+#       };
+#     };
+#   };
+
+  # GNOME Keyring configuration
+#   services.gnome.gnome-keyring.enable = true;
+#   security.pam.services.greetd.enableGnomeKeyring = true;
+#   security.pam.services.gdm.enableGnomeKeyring = true;
+#   security.pam.services.gdm-password.enableGnomeKeyring = true;
+
+  # TAKEN FROM: https://github.com/iancleary/desktop-config/blob/0b918f4c4376a0e28f5e5b2598a9d585f6768478/modules/desktop/hyprland/default.nix#L59-L83
+  # https://nixos.wiki/wiki/Greetd
+  # tweaked for Hyprland
+  # ...
+  # launches swaylock with exec-once in home/hyprland/hyprland.conf
+  # ...
+  # single user and single window manager
+  # my goal here is auto-login with authentication
+  # so I can declare my user and environment (Hyprland) in this config
+  # my goal is NOT to allow user selection or environment selection at the the login screen
+  # (which a login manager provides beyond just the authentication check)
+  # so I don't need a login manager
+  # I just launch Hyprland as iancleary automatically, which starts swaylock (to authenticate)
+  # I thought I needed a greeter, but I really don't
+  # ...
+#   services.greetd = {
+#     enable = true;
+#     settings = rec {
+#       initial_session = {
+#         command = "${pkgs.hyprland}/bin/Hyprland";
+#         user = "quartzar";
+#       };
+#       default_session = initial_session;
+#     };
+#   };
+
+  # Display Manager
   services.xserver = {
     enable = true;
     xkb.layout = "gb";
   };
+
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
   };
+
+  # GNOME Keyring
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services = {
+    sddm.enableGnomeKeyring = true;
+    login.enableGnomeKeyring = true;
+  };
+
+#   services.displayManager.sddm = {
+#     enable = true;
+#     wayland.enable = true;
+#   };
 
   # Flatpak
   services.flatpak.enable = true;
@@ -125,7 +198,7 @@
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1";
     MOZ_ENABLE_WAYLAND = "1";
-    XDG_CURRENT_DESKTOP = "Hyprland";
+#     XDG_CURRENT_DESKTOP = "Hyprland";
     LIBVA_DRIVER_NAME = "nvidia";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
     NVD_BACKEND = "direct";
@@ -133,9 +206,12 @@
     XDG_CONFIG_HOME = "$HOME/.config";
     XDG_DATA_HOME   = "$HOME/.local/share";
 #     XDG_STATE_HOME  = "$HOME/.local/state";
+    XDG_RUNTIME_DIR = "/run/user/$UID";
     ELECTRON_OZONE_PLATFORM_HINT = "wayland";
-    SSH_AUTH_LOCK = "/run/user/1000/keyring/ssh";
+#     SSH_AUTH_LOCK = "/run/user/1000/keyring/ssh";
 #     XDG_DATA_DIRS = "/var/lib/flatpak/exports/share:/home/quartzar/.local/share/flatpak/exports/share:$XDG_DATA_DIRS";
+    SSH_AUTH_SOCK = "/run/user/$UID/keyring/ssh";
+    GNOME_KEYRING_CONTROL = "/run/user/$UID/keyring";
   };
 
 
@@ -199,7 +275,11 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     hyprland-protocols
-    hyprpicker 
+    hyprpaper  # wallpaper utility
+    hyprpicker   # colour picker
+    wl-clipboard  # allows copying to clipboard
+    playerctl  # media player control
+    brightnessctl  # brightness control
     wireplumber
     pipewire
     pavucontrol
@@ -247,7 +327,7 @@
     zsh-autosuggestions
     zsh-syntax-highlighting
     spotify
-    vscode
+#     vscode.fhs
     papirus-icon-theme  # like my beloved gruvbox icons, https://www.pling.com/p/1166289/
     (discord.override { withVencord = true; })
     seahorse  # GUI for managing passwords
@@ -256,6 +336,8 @@
     vlc
     plex-desktop
     nwg-look
+    openssl
+    cacert
   ];
   
 
