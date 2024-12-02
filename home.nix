@@ -36,8 +36,8 @@
 #     syntaxHighlighting.enable = false;
 
     shellAliases = {
-      rebuild = "sudo nixos-rebuild switch --flake /etc/nixos#default";
-      testbuild = "sudo nixos-rebuild test --flake /etc/nixos#default";
+      rebuild = "sudo nixos-rebuild switch --flake $HOME/etc/nixos#default";
+      testbuild = "sudo nixos-rebuild test --flake $HOME/etc/nixos#default";
       sudo = "sudo ";
       python = "python3";
     };
